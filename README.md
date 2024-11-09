@@ -20,12 +20,12 @@ step 1. Clone the repository:
     cd freeroot
     
     
-step 2. Run the installer script:\
+step 2. Run the installer script:
 
   ```sh
     ./root.sh
   ```
-    -or
+or
     
   ```sh
     bash root.sh
