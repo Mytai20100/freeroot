@@ -69,6 +69,25 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   touch "$ROOTFS_DIR/.installed"
 fi
 
+# Ensure /bin/sh exists in the root filesystem
+if [ ! -f "$ROOTFS_DIR/bin/sh" ]; then
+  echo "Installing /bin/sh (bash)"
+  mkdir -p "$ROOTFS_DIR/bin"
+  ln -s /usr/bin/bash "$ROOTFS_DIR/bin/sh"
+fi
+
+# Ensure /root exists
+if [ ! -d "$ROOTFS_DIR/root" ]; then
+  mkdir -p "$ROOTFS_DIR/root"
+fi
+
+# Install bash if it's not present in rootfs
+if [ ! -f "$ROOTFS_DIR/usr/bin/bash" ]; then
+  echo "Installing bash in rootfs"
+  apt-get update
+  apt-get install -y bash
+fi
+
 # Get system information
 cpu_info=$(lscpu | grep "Model name:" | awk -F: '{print $2}' | xargs)
 ram_info=$(free -h | grep "Mem:" | awk '{print $2}')
