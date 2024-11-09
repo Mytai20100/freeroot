@@ -17,12 +17,12 @@ fi
 
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   echo "#######################################################################################"
-  echo "#"
-  echo "#                                      Proot INSTALLER
-  echo "#"
-  echo "#                                    Copyright (C) 2024
-  echo "#"
-  echo "#"
+  echo "#                                                                                     #"
+  echo "#                                      Proot INSTALLER                                #"
+  echo "#                                                                                     #"
+  echo "#                                    Copyright (C) 2024                               #"
+  echo "#                                                                                     #"
+  echo "#                                                                                     #"
   echo "#######################################################################################"
 
   read -p "Do you want to install Ubuntu? (YES/no): " install_ubuntu
