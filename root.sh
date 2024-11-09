@@ -15,7 +15,7 @@ else
   exit 1
 fi
 
-# Chọn hệ điều hành rootfs
+# Select rootfs operating system
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   echo "#######################################################################################"
   echo "#"
@@ -32,7 +32,7 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
   read -p "Enter your choice (1/2/3): " os_choice
 fi
 
-# Tải root filesystem dựa trên lựa chọn của người dùng
+# Load root filesystem based on user selection
 case $os_choice in
   1)
     os_name="Ubuntu"
@@ -52,14 +52,14 @@ case $os_choice in
     ;;
 esac
 
-# Cài đặt rootfs
+# Install rootfs
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   echo "Installing ${os_name} rootfs..."
   wget --tries=$max_retries --timeout=$timeout --no-hsts -O /tmp/rootfs.tar.gz "$rootfs_url"
   tar -xf /tmp/rootfs.tar.gz -C $ROOTFS_DIR
 fi
 
-# Cài đặt proot
+# Install proot
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   mkdir -p $ROOTFS_DIR/usr/local/bin
   wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/Mytai20100x/freeroot/main/proot-${ARCH}"
@@ -78,14 +78,14 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
   chmod 755 $ROOTFS_DIR/usr/local/bin/proot
 fi
 
-# Thiết lập DNS và đánh dấu hoàn tất cài đặt
+# Set up DNS and mark installation complete
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   printf "nameserver 1.1.1.1\nnameserver 1.0.0.1" > ${ROOTFS_DIR}/etc/resolv.conf
   rm -rf /tmp/rootfs.tar.gz
   touch $ROOTFS_DIR/.installed
 fi
 
-# Lấy thông tin hệ thống
+# Get system information
 cpu_info=$(lscpu | grep "Model name:" | awk -F: '{print $2}' | xargs)
 ram_info=$(free -h | grep "Mem:" | awk '{print $2}')
 disk_info=$(df -h $ROOTFS_DIR | grep -v "Filesystem" | awk '{print $2}')
@@ -94,7 +94,7 @@ CYAN='\e[0;36m'
 WHITE='\e[0;37m'
 RESET_COLOR='\e[0m'
 
-# Hiển thị thông tin hệ thống
+# Display system information
 echo -e "${WHITE}System Information:${RESET_COLOR}"
 echo -e "CPU Model: ${cpu_info}"
 echo -e "Total RAM: ${ram_info}"
@@ -109,7 +109,7 @@ display_gg() {
 clear
 display_gg
 
-# Khởi chạy Proot với rootfs của hệ điều hành được chọn
+# Launch Proot with the operating system's rootfs selected
 $ROOTFS_DIR/usr/local/bin/proot \
   --rootfs="${ROOTFS_DIR}" \
   -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit \
