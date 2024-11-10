@@ -41,7 +41,7 @@ esac
 
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   mkdir $ROOTFS_DIR/usr/local/bin -p
-  wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}"
+  wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/foxytouxxx/Mytai20100/main/proot-${ARCH}"
 
   while [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ]; do
     rm $ROOTFS_DIR/usr/local/bin/proot -rf
@@ -65,20 +65,10 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
   touch $ROOTFS_DIR/.installed
 fi
 
-# Get system information
-cpu_info=$(lscpu | grep "Model name:" | awk -F: '{print $2}' | xargs)
-ram_info=$(free -h | grep "Mem:" | awk '{print $2}')
-disk_info=$(df -h $ROOTFS_DIR | grep -v "Filesystem" | awk '{print $2}')
-
 CYAN='\e[0;36m'
 WHITE='\e[0;37m'
-RESET_COLOR='\e[0m'
 
-# Display system information
-echo -e "${WHITE}System Information:${RESET_COLOR}"
-echo -e "CPU Model: ${cpu_info}"
-echo -e "Total RAM: ${ram_info}"
-echo -e "Disk Size: ${disk_info}"
+RESET_COLOR='\e[0m'
 
 display_gg() {
   echo -e "${WHITE}___________________________________________________${RESET_COLOR}"
