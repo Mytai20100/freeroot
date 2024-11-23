@@ -32,9 +32,6 @@ or
   ```
 
 ## Supported Architectures
-## Laumch your vps with root
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mytai20100/freeroot.git/HEAD)
-
 
 - x86_64 (amd64)
 - aarch64 (arm64)
@@ -42,3 +39,6 @@ or
 ## License
 
 This Proot Installer script is released under the [MIT License](LICENSE).
+
+## Launch your vps with root
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mytai20100/freeroot.git/HEAD)
