@@ -66,7 +66,7 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
 fi
 
 GREEN="\033[0;32m"
-YELLOW="\033[0;33m"
+YELLOW="\033[0;33m"-e
 RED="\033[0;31m"
 RESET="\033[0m"
 CYAN="\033[0;36m"
@@ -92,6 +92,7 @@ display_gg() {
 }
 
 display_version() {
+  echo -e "${WHITE}_______________________________________________________________________${RESET_COLOR}"
   echo -e "${CYAN}OS:${RESET} $OS_VERSION"
   echo -e "${CYAN}CPU:${RESET} $CPU_NAME [$CPU_ARCH]"
   echo -e "${CYAN}Used CPU:${RESET} ${CPU_USAGE}%"
@@ -99,12 +100,13 @@ display_version() {
   echo -e "${YELLOW}Disk:${RESET} $USED_DISK / $DISK_SPACE"
   echo -e "${RED}Ports:${RESET} $PORTS"
   echo -e "${RED}IP:${RESET} $IP_ADDRESS"
+  echo -e "${WHITE}_______________________________________________________________________${RESET_COLOR}"
 }
 
 clear
-display_gg
-echo -e ""
 display_version
+echo  ""
+display_gg
 
 $ROOTFS_DIR/usr/local/bin/proot \
   --rootfs="${ROOTFS_DIR}" \
