@@ -32,6 +32,9 @@ or
   ```
 
 ## Supported Architectures
+## Laumch your vps with root
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mytai20100/freeroot.git/HEAD)
+
 
 - x86_64 (amd64)
 - aarch64 (arm64)
