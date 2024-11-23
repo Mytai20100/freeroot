@@ -16,7 +16,7 @@ else
 fi
 
 if [ ! -e $ROOTFS_DIR/.installed ]; then
-    echo "#######################################################################################"
+  echo "#######################################################################################"
   echo "#                                                                                     #"
   echo "#                                      Proot INSTALLER                                #"
   echo "#                                                                                     #"
@@ -41,7 +41,7 @@ esac
 
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   mkdir $ROOTFS_DIR/usr/local/bin -p
-  wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/foxytouxxx/Mytai20100/main/proot-${ARCH}"
+  wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}"
 
   while [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ]; do
     rm $ROOTFS_DIR/usr/local/bin/proot -rf
@@ -65,19 +65,46 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
   touch $ROOTFS_DIR/.installed
 fi
 
-CYAN='\e[0;36m'
-WHITE='\e[0;37m'
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+RED="\033[0;31m"
+RESET="\033[0m"
+CYAN="\033[0;36m"
+WHITE="\033[0;37m"
+RESET_COLOR="\033[0m"
 
-RESET_COLOR='\e[0m'
+# Lấy thông tin hệ thống
+OS_VERSION=$(lsb_release -ds 2>/dev/null || echo "N/A")
+CPU_NAME=$(lscpu | awk -F: '/Model name:/ {print $2}' | sed 's/^ //')
+CPU_ARCH=$(uname -m)
+CPU_USAGE=$(top -bn1 | awk '/Cpu\(s\)/ {print $2 + $4}')
+TOTAL_RAM=$(free -h --si | awk '/^Mem:/ {print $2}')
+USED_RAM=$(free -h --si | awk '/^Mem:/ {print $3}')
+DISK_SPACE=$(df -h / | awk 'NR==2 {print $2}')
+USED_DISK=$(df -h / | awk 'NR==2 {print $3}')
+PORTS=$(ss -tunlp | wc -l)
+IP_ADDRESS=$(hostname -I | awk '{print $1}')
+
 
 display_gg() {
   echo -e "${WHITE}___________________________________________________${RESET_COLOR}"
-  echo -e ""
   echo -e "           ${CYAN}-----> Mission Completed ! <----${RESET_COLOR}"
+}
+
+display_version() {
+  echo -e "${CYAN}OS:${RESET} $OS_VERSION"
+  echo -e "${CYAN}CPU:${RESET} $CPU_NAME [$CPU_ARCH]"
+  echo -e "${CYAN}Used CPU:${RESET} ${CPU_USAGE}%"
+  echo -e "${GREEN}RAM:${RESET} $USED_RAM / $TOTAL_RAM"
+  echo -e "${YELLOW}Disk:${RESET} $USED_DISK / $DISK_SPACE"
+  echo -e "${RED}Ports:${RESET} $PORTS"
+  echo -e "${RED}IP:${RESET} $IP_ADDRESS"
 }
 
 clear
 display_gg
+echo -e ""
+display_version
 
 $ROOTFS_DIR/usr/local/bin/proot \
   --rootfs="${ROOTFS_DIR}" \
