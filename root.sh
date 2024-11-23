@@ -6,11 +6,12 @@ selected=0
 # Function to show header
 show_gg() {
   echo "#######################################################################################"
-  echo "#"
-  echo "#                                   RootFS INSTALLER"
-  echo "#"
-  echo "#                                  Copyright (C) 2024"
-  echo "#"
+  echo "#                                                                                     #"
+  echo "#                                      Proot INSTALLER                                #"
+  echo "#                                                                                     #"
+  echo "#                                    Copyright (C) 2024                               #"
+  echo "#                                                                                     #"
+  echo "#                                                                                     #"
   echo "#######################################################################################"
 }
 
