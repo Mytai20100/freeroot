@@ -89,3 +89,4 @@ while true; do
             ;;
     esac
 done
+clear
