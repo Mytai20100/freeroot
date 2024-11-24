@@ -40,5 +40,5 @@ or
 
 This Proot Installer script is released under the [MIT License](LICENSE).
 
-## Launch your vps with root
+## Launch your vps with proot
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mytai20100/freeroot.git/HEAD)
