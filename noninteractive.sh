@@ -11,7 +11,7 @@ case "$ARCH" in
 esac
 if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
-    echo "#              Proot INSTALLER - Copyright (C) 2024              #"
+    echo "#              Proot INSTALLER - Copyright (C) 2024-2025          #"
     echo "###################################################################"   
     wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O /tmp/rootfs.tar.gz \
         "http://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/ubuntu-base-22.04.5-base-${ARCH_ALT}.tar.gz"  
