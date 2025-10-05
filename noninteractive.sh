@@ -27,7 +27,9 @@ wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/loc
 sleep 1
 done
 chmod 755 $ROOTFS_DIR/usr/local/bin/proot
+mkdir -p $ROOTFS_DIR/root
 printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n">${ROOTFS_DIR}/etc/resolv.conf
+[ ! -e $ROOTFS_DIR/bin/sh ]&&ln -sf /usr/bin/bash $ROOTFS_DIR/bin/sh 2>/dev/null
 rm -rf /tmp/rootfs.tar.gz /tmp/sbin
 touch $ROOTFS_DIR/.installed
 fi
@@ -61,4 +63,4 @@ echo -e "${W}___________________________________________________${X}"
 echo -e "           ${C}-----> Mission Completed ! <----${X}"
 exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot \
 --rootfs="${ROOTFS_DIR}" \
--0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit
+-0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit
