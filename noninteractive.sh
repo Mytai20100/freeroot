@@ -90,5 +90,5 @@ else
     exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot \
         --rootfs="${ROOTFS_DIR}" \
         -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit \
-        /bin/su -
+        ## /bin/su -
 fi
