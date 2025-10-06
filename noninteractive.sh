@@ -14,7 +14,7 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "#              Proot INSTALLER - Copyright (C) 2024-2025          #"
     echo "###################################################################"   
     wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O /tmp/rootfs.tar.gz \
-        "http://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/ubuntu-base-22.04.5-base-${ARCH_ALT}.tar.gz"  
+        "http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.4-base-${ARCH_ALT}.tar.gz"  
     tar -xf /tmp/rootfs.tar.gz -C $ROOTFS_DIR 2>/dev/null
     mkdir -p $ROOTFS_DIR/usr/local/bin 
     wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot \
