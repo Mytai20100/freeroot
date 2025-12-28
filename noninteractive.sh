@@ -13,16 +13,13 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
     echo "#              Proot INSTALLER - Copyright (C) 2024-2025          #"
     echo "###################################################################"   
-    wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O /tmp/rootfs.tar.gz \
-        "http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.4-base-${ARCH_ALT}.tar.gz"  
+    wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O /tmp/rootfs.tar.gz "http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.4-base-${ARCH_ALT}.tar.gz"  
     tar -xf /tmp/rootfs.tar.gz -C $ROOTFS_DIR 2>/dev/null
     mkdir -p $ROOTFS_DIR/usr/local/bin 
-    wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot \
-        "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}"
+    wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}"
     while [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ]; do
         rm -rf $ROOTFS_DIR/usr/local/bin/proot
-        wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot \
-            "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}"
+        wget -q --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}"
         [ -s "$ROOTFS_DIR/usr/local/bin/proot" ] && chmod 755 $ROOTFS_DIR/usr/local/bin/proot && break
         sleep 1
     done
@@ -82,13 +79,7 @@ echo -e "${W}___________________________________________________${X}"
 echo ""
 if [ -e $ROOTFS_DIR/init.sh ]; then
     echo -e "${Y}[*] First run: Installing bash...${X}"
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot \
-        --rootfs="${ROOTFS_DIR}" \
-        -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit \
-        /init.sh
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /init.sh
 else
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot \
-        --rootfs="${ROOTFS_DIR}" \
-        -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit \
-        ## /bin/su -
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /bin/bash
 fi
