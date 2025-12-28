@@ -1,8 +1,8 @@
 # PROOT Installer
 
 ## Overview
-
-This shell script is designed to automate the installation of Mytai2010, a lightweight any operating system environment using Proot.
+Hmm
+This shell script is designed to automate the installation of Mytai20100, a lightweight any operating system environment using Proot.
 
 ## Prerequisites
 
@@ -39,6 +39,17 @@ or
 ## License
 
 This Proot Installer script is released under the [MIT License](LICENSE).
-
+## Credit 
+thx your script:[foxytouxxx](https://github.com/foxytouxxx/freeroot)
 ## Launch your vps with proot
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mytai20100/freeroot.git/HEAD)
+# Change logs
++ Nov 9, 2024 add proot-aarch64 , proot-x86_64 , root.sh from foxytouxxx | add Debia.sh, Ubuntu.sh by me
++ Nov 10, 2024 idk fix some things in Ubuntu.sh
++ Nov 23, 2024 umm update some thing  in root.sh and Ubuntu.sh
++ Nov 24, 2024 :? root.sh
++ Oct 5, 2025 add noninteractive.sh update to 24.04 and it error i back to 22.04
++ Oct 6, 2025 update some things
++ Dec 28, 2025 fix error java reset
+
+
