@@ -9,7 +9,6 @@ case "$ARCH" in
     aarch64) ARCH_ALT=arm64 ;;
     *) printf "Unsupported CPU: ${ARCH}\n"; exit 1 ;;
 esac
-
 df() {
     url="$1"; output="$2"; retries=0
     while [ $retries -lt $max_retries ]; do
@@ -25,7 +24,6 @@ df() {
     done
     return 1
 }
-
 if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
     echo "#              Proot INSTALLER - Copyright (C) 2024-2025          #"
@@ -45,14 +43,13 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     rm -rf /tmp/rootfs.tar.gz /tmp/sbin
     touch $ROOTFS_DIR/.installed
 fi
-
 G="\033[0;32m"
 Y="\033[0;33m"
 R="\033[0;31m"
 C="\033[0;36m"
 W="\033[0;37m"
 X="\033[0m"
-OS=$(lsb_release -ds 2>/dev/null || echo "N/A")
+OS=$(lsb_release -ds 2>/dev/null || cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d'"' -f2 || uname -o 2>/dev/null || echo "Unknown")
 CPU=$(lscpu | awk -F: '/Model name:/{print $2}' | sed 's/^ *//')
 ARCH_D=$(uname -m)
 CPU_U=$(top -bn1 | awk '/Cpu\(s\)/{print $2+$4}')
@@ -74,9 +71,9 @@ elif [ $(echo "$RAM_PERCENT > 60" | bc -l 2>/dev/null || echo 0) -eq 1 ]; then
 else
     RAM_COLOR=$G
 fi
-DISK=$(df -h / | awk 'NR==2{print $2}')
-UDISK=$(df -h / | awk 'NR==2{print $3}')
-DISK_PERCENT=$(df -h / | awk 'NR==2{print $5}' | sed 's/%//')
+DISK=$(df -h / 2>/dev/null | awk 'NR==2{print $2}' | grep -v '^$' || echo "N/A")
+UDISK=$(df -h / 2>/dev/null | awk 'NR==2{print $3}' | grep -v '^$' || echo "N/A")
+DISK_PERCENT=$(df / 2>/dev/null | awk 'NR==2{print $5}' | sed 's/%//' | grep -E '^[0-9]+$' || echo "0")
 if [ "$DISK_PERCENT" -gt 80 ] 2>/dev/null; then
     DISK_COLOR=$R
 elif [ "$DISK_PERCENT" -gt 60 ] 2>/dev/null; then
@@ -84,7 +81,7 @@ elif [ "$DISK_PERCENT" -gt 60 ] 2>/dev/null; then
 else
     DISK_COLOR=$G
 fi
-IP=$(hostname -I | awk '{print $1}')
+IP=$(hostname -I 2>/dev/null | awk '{print $1}' | grep -v '^$' || ip addr show 2>/dev/null | grep 'inet ' | grep -v '127.0.0.1' | head -1 | awk '{print $2}' | cut -d'/' -f1 || echo "N/A")
 clear
 echo -e "${C}OS:${X}   $OS"
 echo -e "${C}CPU:${X}  $CPU [$ARCH_D]  ${CPU_COLOR}Usage: ${CPU_U}%${X}"
