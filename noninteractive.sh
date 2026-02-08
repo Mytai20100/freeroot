@@ -9,7 +9,6 @@ case "$ARCH" in
     aarch64) ARCH_ALT=arm64 ;;
     *) printf "Unsupported CPU: ${ARCH}\n"; exit 1 ;;
 esac
-
 df() {
     url="$1"; output="$2"; retries=0
     while [ $retries -lt $max_retries ]; do
@@ -25,7 +24,6 @@ df() {
     done
     return 1
 }
-
 if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
     echo "#              Proot INSTALLER - Copyright (C) 2024-2025          #"
@@ -45,7 +43,6 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     rm -rf /tmp/rootfs.tar.gz /tmp/sbin
     touch $ROOTFS_DIR/.installed
 fi
-
 G="\033[0;32m"
 Y="\033[0;33m"
 R="\033[0;31m"
