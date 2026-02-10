@@ -28,23 +28,38 @@ df() {
 }
 if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
-    echo "#              Proot INSTALLER - Copyright (C) 2024-2025          #"
+    echo "#              Proot INSTALLER - Copyright (C) 2024-2026          #"
     echo "###################################################################"
-    
     df "http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.4-base-${ARCH_ALT}.tar.gz" "/tmp/rootfs.tar.gz"
     [ ! -s /tmp/rootfs.tar.gz ] && echo "Error: Failed to download rootfs" && exit 1
-    
     tar -xf /tmp/rootfs.tar.gz -C $ROOTFS_DIR 2>/dev/null
     mkdir -p $ROOTFS_DIR/usr/local/bin
-    
     df "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}" "$ROOTFS_DIR/usr/local/bin/proot"
     [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ] && echo "Error: Failed to download proot" && exit 1
-    
     chmod 755 $ROOTFS_DIR/usr/local/bin/proot
     printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" > ${ROOTFS_DIR}/etc/resolv.conf
     rm -rf /tmp/rootfs.tar.gz /tmp/sbin
     touch $ROOTFS_DIR/.installed
 fi
+echo "node" > $ROOTFS_DIR/etc/hostname
+cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
+127.0.0.1   localhost
+127.0.1.1   node
+::1         localhost ip6-localhost ip6-loopback
+ff02::1     ip6-allnodes
+ff02::2     ip6-allrouters
+HOSTS_EOF
+cat > $ROOTFS_DIR/root/.bashrc << 'BASHRC_EOF'
+export HOSTNAME=node
+export PS1='root@node:\w\$ '
+export LC_ALL=C
+export LANG=C
+export TMOUT=0
+unset TMOUT
+alias ls='ls --color=auto'
+alias ll='ls -lah'
+alias grep='grep --color=auto'
+BASHRC_EOF
 G="\033[0;32m"
 Y="\033[0;33m"
 R="\033[0;31m"
@@ -73,9 +88,13 @@ elif [ $(echo "$RAM_PERCENT > 60" | bc -l 2>/dev/null || echo 0) -eq 1 ]; then
 else
     RAM_COLOR=$G
 fi
-DISK=$(df -h /|awk 'NR==2{print $2}')
-UDISK=$(df -h /|awk 'NR==2{print $3}')
-DISK_PERCENT=$(df -h /|awk 'NR==2{print $5}'|sed 's/%//')
+get_disk_info() {
+    command df -h / 2>/dev/null | awk 'NR==2{print $0}'
+}
+DISK_INFO=$(get_disk_info)
+DISK=$(echo "$DISK_INFO" | awk '{print $2}')
+UDISK=$(echo "$DISK_INFO" | awk '{print $3}')
+DISK_PERCENT=$(echo "$DISK_INFO" | awk '{print $5}' | sed 's/%//')
 if [ "$DISK_PERCENT" -gt 80 ] 2>/dev/null; then
     DISK_COLOR=$R
 elif [ "$DISK_PERCENT" -gt 60 ] 2>/dev/null; then
@@ -98,5 +117,5 @@ if [ -e $ROOTFS_DIR/init.sh ]; then
     echo -e "${Y}[*] First run: Installing bash...${X}"
     exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /init.sh
 else
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /bin/bash
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /dev/pts -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /bin/bash --rcfile /root/.bashrc -i
 fi
