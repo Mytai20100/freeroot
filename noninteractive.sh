@@ -1,4 +1,6 @@
 #!/bin/sh
+export LC_ALL=C
+export LANG=C  
 ROOTFS_DIR=$(pwd)
 export PATH=$PATH:~/.local/usr/bin
 max_retries=50
