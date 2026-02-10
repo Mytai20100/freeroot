@@ -51,5 +51,6 @@ thx your script:[foxytouxxx](https://github.com/foxytouxxx/freeroot)
 + Oct 5, 2025 add noninteractive.sh update to 24.04 and it error i back to 22.04
 + Oct 6, 2025 update some things
 + Dec 28, 2025 fix error java reset
++ Feb 10, 2026 Update hostname "node", fix get disk
 
 
