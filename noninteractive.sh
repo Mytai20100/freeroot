@@ -49,6 +49,13 @@ cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
 ff02::1     ip6-allnodes
 ff02::2     ip6-allrouters
 HOSTS_EOF
+cat > $ROOTFS_DIR/root/.autorun.sh << 'AUTORUN_EOF'
+#!/bin/bash
+[ -f /root/.runlist ] && while read -r cmd; do
+    [ -n "$cmd" ] && eval "$cmd" &
+done < /root/.runlist
+AUTORUN_EOF
+chmod +x $ROOTFS_DIR/root/.autorun.sh
 cat > $ROOTFS_DIR/root/.bashrc << 'BASHRC_EOF'
 export HOSTNAME=node
 export PS1='root@node:\w\$ '
@@ -59,6 +66,34 @@ unset TMOUT
 alias ls='ls --color=auto'
 alias ll='ls -lah'
 alias grep='grep --color=auto'
+[ -f /root/.autorun.sh ] && [ ! -f /tmp/.ran ] && (/root/.autorun.sh; touch /tmp/.ran)
+run() {
+    case "$1" in
+        add)
+            shift
+            echo "$@" >> /root/.runlist
+            echo "Added: $@"
+            ;;
+        rm|remove)
+            shift
+            grep -v "^$*$" /root/.runlist > /tmp/.runlist.tmp 2>/dev/null
+            mv /tmp/.runlist.tmp /root/.runlist 2>/dev/null
+            echo "Removed: $@"
+            ;;
+        list|ls)
+            [ -f /root/.runlist ] && cat -n /root/.runlist || echo "Empty"
+            ;;
+        now)
+            rm -f /tmp/.ran
+            /root/.autorun.sh
+            touch /tmp/.ran
+            echo "Executed all commands"
+            ;;
+        *)
+            [ -n "$1" ] && echo "$@" >> /root/.runlist && echo "Added: $@" || echo "Usage: run add/rm/list/now <command>"
+            ;;
+    esac
+}
 BASHRC_EOF
 G="\033[0;32m"
 Y="\033[0;33m"
