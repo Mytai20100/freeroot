@@ -11,6 +11,10 @@ case "$ARCH" in
     aarch64) ARCH_ALT=arm64 ;;
     *) printf "Unsupported CPU: ${ARCH}\n"; exit 1 ;;
 esac
+dbb() {
+    [ -x "$ROOTFS_DIR/busybox-${ARCH}" ] && bb="$ROOTFS_DIR/busybox-${ARCH}" || bb=""
+}
+dbb
 df() {
     url="$1"; output="$2"; retries=0
     while [ $retries -lt $max_retries ]; do
@@ -18,29 +22,54 @@ df() {
             wget -q --tries=3 --timeout=$timeout --no-hsts -O "$output" "$url" 2>/dev/null
         elif command -v curl >/dev/null 2>&1; then
             curl -f -s -L --max-time $timeout --retry 3 -o "$output" "$url" 2>/dev/null
+        elif [ -n "$bb" ]; then
+            $bb wget -q -T $timeout -O "$output" "$url" 2>/dev/null
         else
-            printf "Error: Neither wget nor curl found\n"; return 1
+            printf "Error: No download tool found (wget / curl / busybox)\n"
+            return 1
         fi
-        [ -s "$output" ] && [ $(stat -c%s "$output" 2>/dev/null || stat -f%z "$output" 2>/dev/null) -gt 1024 ] && return 0
-        rm -f "$output"; retries=$((retries + 1)); sleep 1
+        [ -s "$output" ] && \
+        [ $(stat -c%s "$output" 2>/dev/null || stat -f%z "$output" 2>/dev/null) -gt 1024 ] && \
+        return 0
+        rm -f "$output"
+        retries=$((retries + 1))
+        sleep 1
     done
+    printf "Error: Download failed after %d retries: %s\n" "$max_retries" "$url"
     return 1
+}
+extract() {
+    archive="$1"; dest="$2"
+    if command -v tar >/dev/null 2>&1; then
+        tar -xf "$archive" -C "$dest" 2>/dev/null
+    elif [ -n "$bb" ]; then
+        $bb tar -xf "$archive" -C "$dest" 2>/dev/null
+    else
+        printf "Error: No extraction tool found (tar / busybox)\n"
+        return 1
+    fi
 }
 if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
     echo "#              Proot INSTALLER - Copyright (C) 2024-2026          #"
     echo "###################################################################"
+
     df "http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.4-base-${ARCH_ALT}.tar.gz" "/tmp/rootfs.tar.gz"
     [ ! -s /tmp/rootfs.tar.gz ] && echo "Error: Failed to download rootfs" && exit 1
-    tar -xf /tmp/rootfs.tar.gz -C $ROOTFS_DIR 2>/dev/null
+
+    extract "/tmp/rootfs.tar.gz" "$ROOTFS_DIR"
+    [ $? -ne 0 ] && echo "Error: Failed to extract rootfs" && exit 1
+
     mkdir -p $ROOTFS_DIR/usr/local/bin
     df "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}" "$ROOTFS_DIR/usr/local/bin/proot"
     [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ] && echo "Error: Failed to download proot" && exit 1
     chmod 755 $ROOTFS_DIR/usr/local/bin/proot
+
     printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" > ${ROOTFS_DIR}/etc/resolv.conf
     rm -rf /tmp/rootfs.tar.gz /tmp/sbin
     touch $ROOTFS_DIR/.installed
 fi
+
 echo "node" > $ROOTFS_DIR/etc/hostname
 cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
 127.0.0.1   localhost
@@ -49,6 +78,7 @@ cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
 ff02::1     ip6-allnodes
 ff02::2     ip6-allrouters
 HOSTS_EOF
+
 cat > $ROOTFS_DIR/root/.autorun.sh << 'AUTORUN_EOF'
 #!/bin/bash
 [ -f /root/.runlist ] && while read -r cmd; do
@@ -56,6 +86,7 @@ cat > $ROOTFS_DIR/root/.autorun.sh << 'AUTORUN_EOF'
 done < /root/.runlist
 AUTORUN_EOF
 chmod +x $ROOTFS_DIR/root/.autorun.sh
+
 cat > $ROOTFS_DIR/root/.bashrc << 'BASHRC_EOF'
 export HOSTNAME=node
 export PS1='root@node:\w\$ '
@@ -95,6 +126,7 @@ run() {
     esac
 }
 BASHRC_EOF
+
 G="\033[0;32m"
 Y="\033[0;33m"
 R="\033[0;31m"
