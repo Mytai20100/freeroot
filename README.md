@@ -52,5 +52,5 @@ thx your script:[foxytouxxx](https://github.com/foxytouxxx/freeroot)
 + Oct 6, 2025 update some things
 + Dec 28, 2025 fix error java reset
 + Feb 10, 2026 Update hostname "node", fix get disk
-
++ Mar 10, 2026 Add busybox for wget , tar 
 
