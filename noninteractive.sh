@@ -70,6 +70,8 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     touch $ROOTFS_DIR/.installed
 fi
 
+chmod -R 755 $ROOTFS_DIR/usr/local/bin/ 2>/dev/null
+
 echo "node" > $ROOTFS_DIR/etc/hostname
 cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
 127.0.0.1   localhost
@@ -184,7 +186,7 @@ echo -e "${W}___________________________________________________${X}"
 echo ""
 if [ -e $ROOTFS_DIR/init.sh ]; then
     echo -e "${Y}[*] First run: Installing bash...${X}"
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /init.sh
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf -b $ROOTFS_DIR/usr/local/bin:/usr/local/bin --kill-on-exit /init.sh
 else
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /dev/pts -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /bin/bash --rcfile /root/.bashrc -i
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /dev/pts -b /sys -b /proc -b /etc/resolv.conf -b $ROOTFS_DIR/usr/local/bin:/usr/local/bin --kill-on-exit /bin/bash --rcfile /root/.bashrc -i
 fi
