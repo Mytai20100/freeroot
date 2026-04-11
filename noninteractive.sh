@@ -53,25 +53,18 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
     echo "#              Proot INSTALLER - Copyright (C) 2024-2026          #"
     echo "###################################################################"
-
     df "http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.4-base-${ARCH_ALT}.tar.gz" "/tmp/rootfs.tar.gz"
     [ ! -s /tmp/rootfs.tar.gz ] && echo "Error: Failed to download rootfs" && exit 1
-
     extract "/tmp/rootfs.tar.gz" "$ROOTFS_DIR"
     [ $? -ne 0 ] && echo "Error: Failed to extract rootfs" && exit 1
-
     mkdir -p $ROOTFS_DIR/usr/local/bin
     df "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}" "$ROOTFS_DIR/usr/local/bin/proot"
     [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ] && echo "Error: Failed to download proot" && exit 1
     chmod 755 $ROOTFS_DIR/usr/local/bin/proot
-
     printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" > ${ROOTFS_DIR}/etc/resolv.conf
     rm -rf /tmp/rootfs.tar.gz /tmp/sbin
     touch $ROOTFS_DIR/.installed
 fi
-
-chmod -R 755 $ROOTFS_DIR/usr/local/bin/ 2>/dev/null
-
 echo "node" > $ROOTFS_DIR/etc/hostname
 cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
 127.0.0.1   localhost
@@ -80,7 +73,6 @@ cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
 ff02::1     ip6-allnodes
 ff02::2     ip6-allrouters
 HOSTS_EOF
-
 cat > $ROOTFS_DIR/root/.autorun.sh << 'AUTORUN_EOF'
 #!/bin/bash
 [ -f /root/.runlist ] && while read -r cmd; do
@@ -88,7 +80,6 @@ cat > $ROOTFS_DIR/root/.autorun.sh << 'AUTORUN_EOF'
 done < /root/.runlist
 AUTORUN_EOF
 chmod +x $ROOTFS_DIR/root/.autorun.sh
-
 cat > $ROOTFS_DIR/root/.bashrc << 'BASHRC_EOF'
 export HOSTNAME=node
 export PS1='root@node:\w\$ '
@@ -186,7 +177,7 @@ echo -e "${W}___________________________________________________${X}"
 echo ""
 if [ -e $ROOTFS_DIR/init.sh ]; then
     echo -e "${Y}[*] First run: Installing bash...${X}"
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf -b $ROOTFS_DIR/usr/local/bin:/usr/local/bin --kill-on-exit /init.sh
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /init.sh
 else
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /dev/pts -b /sys -b /proc -b /etc/resolv.conf -b $ROOTFS_DIR/usr/local/bin:/usr/local/bin --kill-on-exit /bin/bash --rcfile /root/.bashrc -i
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /dev/pts -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /bin/bash --rcfile /root/.bashrc -i
 fi
