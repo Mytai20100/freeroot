@@ -7,8 +7,10 @@ max_retries=50
 timeout=10
 ARCH=$(uname -m)
 case "$ARCH" in
-    x86_64) ARCH_ALT=amd64 ;;
-    aarch64) ARCH_ALT=arm64 ;;
+    x86_64)  ARCH_ALT=amd64  PROOT_ARCH=amd64 ;;
+    aarch64) ARCH_ALT=arm64  PROOT_ARCH=arm64 ;;
+    armv7l)  ARCH_ALT=armhf  PROOT_ARCH=armv7 ;;
+    armv6l)  ARCH_ALT=armel  PROOT_ARCH=armv6 ;;
     *) printf "Unsupported CPU: ${ARCH}\n"; exit 1 ;;
 esac
 dbb() {
@@ -58,13 +60,29 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     extract "/tmp/rootfs.tar.gz" "$ROOTFS_DIR"
     [ $? -ne 0 ] && echo "Error: Failed to extract rootfs" && exit 1
     mkdir -p $ROOTFS_DIR/usr/local/bin
-    df "https://raw.githubusercontent.com/Mytai20100/freeroot/main/proot-${ARCH}" "$ROOTFS_DIR/usr/local/bin/proot"
+    df "https://github.com/Mytai20100/freeproot/releases/latest/download/proot-${PROOT_ARCH}" "$ROOTFS_DIR/usr/local/bin/proot"
     [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ] && echo "Error: Failed to download proot" && exit 1
     chmod 755 $ROOTFS_DIR/usr/local/bin/proot
     printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" > ${ROOTFS_DIR}/etc/resolv.conf
     rm -rf /tmp/rootfs.tar.gz /tmp/sbin
     touch $ROOTFS_DIR/.installed
 fi
+mkdir -p $ROOTFS_DIR/usr/local/.config
+cat > $ROOTFS_DIR/usr/local/.config/proot.yml << YML_EOF
+rootfs: ${ROOTFS_DIR}
+cwd: /root
+fake_root: true
+kill_on_exit: true
+verbose: 0
+command: /bin/bash
+bindings:
+  - /dev
+  - /dev/pts
+  - /sys
+  - /proc
+  - /etc/resolv.conf
+YML_EOF
+export PROOT_CONFIG="$ROOTFS_DIR/usr/local/.config/proot.yml"
 echo "node" > $ROOTFS_DIR/etc/hostname
 cat > $ROOTFS_DIR/etc/hosts << 'HOSTS_EOF'
 127.0.0.1   localhost
@@ -79,7 +97,7 @@ cat > $ROOTFS_DIR/root/.autorun.sh << 'AUTORUN_EOF'
     [ -n "$cmd" ] && eval "$cmd" &
 done < /root/.runlist
 AUTORUN_EOF
-chmod +x $ROOTFS_DIR/root/.autorun.sh
+chmod 755 $ROOTFS_DIR/root/.autorun.sh
 cat > $ROOTFS_DIR/root/.bashrc << 'BASHRC_EOF'
 export HOSTNAME=node
 export PS1='root@node:\w\$ '
@@ -119,7 +137,7 @@ run() {
     esac
 }
 BASHRC_EOF
-
+chmod 644 $ROOTFS_DIR/root/.bashrc
 G="\033[0;32m"
 Y="\033[0;33m"
 R="\033[0;31m"
@@ -132,7 +150,6 @@ CPU=$(lscpu 2>/dev/null | awk -F: '/Model name:/{gsub(/^[ \t]+|[ \t]+$/, "", $2)
 [ -z "$CPU" ] && CPU="Unknown"
 ARCH_D=$(uname -m)
 CPU_U=$(top -bn1 | awk '/Cpu\(s\)/{print $2+$4}')
-CPU_IDLE=$(echo "100 - $CPU_U" | bc -l 2>/dev/null || echo "0")
 if [ $(echo "$CPU_U > 75" | bc -l 2>/dev/null || echo 0) -eq 1 ]; then
     CPU_COLOR=$R
 elif [ $(echo "$CPU_U > 50" | bc -l 2>/dev/null || echo 0) -eq 1 ]; then
@@ -177,7 +194,7 @@ echo -e "${W}___________________________________________________${X}"
 echo ""
 if [ -e $ROOTFS_DIR/init.sh ]; then
     echo -e "${Y}[*] First run: Installing bash...${X}"
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /init.sh
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot
 else
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot --rootfs="${ROOTFS_DIR}" -0 -w "/root" -b /dev -b /dev/pts -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /bin/bash --rcfile /root/.bashrc -i
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot
 fi
