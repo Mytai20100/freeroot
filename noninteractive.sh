@@ -71,16 +71,21 @@ mkdir -p $ROOTFS_DIR/usr/local/.config
 cat > $ROOTFS_DIR/usr/local/.config/proot.yml << YML_EOF
 rootfs: ${ROOTFS_DIR}
 cwd: /root
-fake_root: true
+root: true
 kill_on_exit: true
 verbose: 0
-command: /bin/bash
+command:
+  - /bin/bash
+  - --rcfile
+  - /root/.bashrc
+  - -i
 bindings:
   - /dev
   - /dev/pts
   - /sys
   - /proc
   - /etc/resolv.conf
+  - ${ROOTFS_DIR}/usr/local/bin:/usr/local/bin
 YML_EOF
 export PROOT_CONFIG="$ROOTFS_DIR/usr/local/.config/proot.yml"
 echo "node" > $ROOTFS_DIR/etc/hostname
