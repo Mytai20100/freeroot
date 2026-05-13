@@ -29,7 +29,25 @@ or
   ```sh
     bash noninteractive.sh
   ```
-
+## Sub-command 
+Same mini-crontab 
+  ```sh
+     run add/rm/list/now <command>
+   ```
+ Example:
+ 
+ 1.You want add command run now when it start
+  ```sh 
+     run add curl neofetch.sh | bash 
+  ```
+  Or wanna remove it
+  ```sh
+     run rm curl neofetch.sh | bash
+   ```  
+2.Check list jusst
+ ```sh
+    run list
+ ```
 ## Supported Architectures
 
 - x86_64 (amd64)
