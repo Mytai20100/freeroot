@@ -55,7 +55,7 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     echo "###################################################################"
     echo "#              Proot INSTALLER - Copyright (C) 2024-2026          #"
     echo "###################################################################"
-    df "http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.4-base-${ARCH_ALT}.tar.gz" "/tmp/rootfs.tar.gz"
+    df "http://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/ubuntu-base-22.04.5-base-${ARCH_ALT}.tar.gz" "/tmp/rootfs.tar.gz"
     [ ! -s /tmp/rootfs.tar.gz ] && echo "Error: Failed to download rootfs" && exit 1
     extract "/tmp/rootfs.tar.gz" "$ROOTFS_DIR"
     [ $? -ne 0 ] && echo "Error: Failed to extract rootfs" && exit 1
