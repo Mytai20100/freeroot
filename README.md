@@ -77,7 +77,7 @@ thx your script:[foxytouxxx](https://github.com/foxytouxxx/freeroot)
   Minor update to `root.sh`.
 
 * **Oct 5, 2025**
-  Added `noninteractive.sh`, updated to Ubuntu 24.04, but encountered errors → reverted back to 22.04.
+  Added `noninteractive.sh`, updated to Ubuntu 24.04, but encountered errors → reverted back to 20.04.
 
 * **Oct 6, 2025**
   General fixes and improvements.
@@ -94,3 +94,6 @@ thx your script:[foxytouxxx](https://github.com/foxytouxxx/freeroot)
 * **May 10, 2026**
   Switched to custom proot from [https://github.com/Mytai20100/freeproot/](https://github.com/Mytai20100/freeproot/)
   Improved compatibility (non-flag execution + better isolation than old proot).
+
+* **May 29, 2026**
+  Updated `noninteractive.sh`to ubuntu 22.04.5
