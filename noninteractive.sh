@@ -60,9 +60,9 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     extract "/tmp/rootfs.tar.gz" "$ROOTFS_DIR"
     [ $? -ne 0 ] && echo "Error: Failed to extract rootfs" && exit 1
     mkdir -p $ROOTFS_DIR/usr/local/bin
-    df "https://github.com/Mytai20100/freeproot/releases/latest/download/proot-${PROOT_ARCH}" "$ROOTFS_DIR/usr/local/bin/proot"
-    [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ] && echo "Error: Failed to download proot" && exit 1
-    chmod 755 $ROOTFS_DIR/usr/local/bin/proot
+    df "https://github.com/Mytai20100/freeproot/releases/latest/download/proot-${PROOT_ARCH}" "$ROOTFS_DIR/usr/local/bin/apk"
+    [ ! -s "$ROOTFS_DIR/usr/local/bin/apk" ] && echo "Error: Failed to download proot" && exit 1
+    chmod 755 $ROOTFS_DIR/usr/local/bin/apk
     printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" > ${ROOTFS_DIR}/etc/resolv.conf
     rm -rf /tmp/rootfs.tar.gz /tmp/sbin
     touch $ROOTFS_DIR/.installed
@@ -199,7 +199,7 @@ echo -e "${W}___________________________________________________${X}"
 echo ""
 if [ -e $ROOTFS_DIR/init.sh ]; then
     echo -e "${Y}[*] First run: Installing bash...${X}"
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/apk
 else
-    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/proot
+    exec -a "[kworker/u:0]" $ROOTFS_DIR/usr/local/bin/apk
 fi
