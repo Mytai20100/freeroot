@@ -52,7 +52,7 @@ Same mini-crontab
 
 - x86_64 (amd64)
 - aarch64 (arm64)
-- aarch32 (armhf and armel)
+- aarch32 (armhf)
 
 ## License
 
@@ -97,3 +97,6 @@ thx your script:[foxytouxxx](https://github.com/foxytouxxx/freeroot)
 
 * **May 29, 2026**
   Updated `noninteractive.sh`to ubuntu 22.04.5
+
+* **Aug 18, 2026**
+  Unsupported architecture `armv6l` because ubuntu base not available.

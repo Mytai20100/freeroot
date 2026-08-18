@@ -14,7 +14,7 @@ case "$ARCH" in
     *) printf "Unsupported CPU: ${ARCH}\n"; exit 1 ;;
 esac
 dbb() {
-    [ -x "$ROOTFS_DIR/busybox-${ARCH}" ] && bb="$ROOTFS_DIR/busybox-${ARCH}" || bb=""
+    [ -x "$ROOTFS_DIR/busybox-${PROOT_ARCH}" ] && bb="$ROOTFS_DIR/busybox-${PROOT_ARCH}" || bb=""
 }
 dbb
 df() {
@@ -60,7 +60,12 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     extract "/tmp/rootfs.tar.gz" "$ROOTFS_DIR"
     [ $? -ne 0 ] && echo "Error: Failed to extract rootfs" && exit 1
     mkdir -p $ROOTFS_DIR/usr/local/bin
-    df "https://github.com/Mytai20100/freeproot/releases/latest/download/proot-${PROOT_ARCH}" "$ROOTFS_DIR/usr/local/bin/apk"
+    if [ -s "$ROOTFS_DIR/proot-${PROOT_ARCH}" ]; then
+        cp "$ROOTFS_DIR/proot-${PROOT_ARCH}" "$ROOTFS_DIR/usr/local/bin/apk"
+        echo "[*] Using local proot-${PROOT_ARCH}"
+    else
+        df "https://github.com/Mytai20100/freeproot/releases/latest/download/proot-${PROOT_ARCH}" "$ROOTFS_DIR/usr/local/bin/apk"
+    fi
     [ ! -s "$ROOTFS_DIR/usr/local/bin/apk" ] && echo "Error: Failed to download proot" && exit 1
     chmod 755 $ROOTFS_DIR/usr/local/bin/apk
     printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" > ${ROOTFS_DIR}/etc/resolv.conf
